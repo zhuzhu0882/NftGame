@@ -1,16 +1,12 @@
 
-import pandas as pd
-import numpy as np
 import time
 import os
 import random
-import output_json
-import warnings
 import sys
 import copy
-import yaml
 
 #人物基本面板  攻击力 防御力 生命值 治疗值 蓝条  药水 debuff buff 
+#攻击力=基本攻击力+武器符文加成攻击力+符石加成
 #人物A B C D E
 class Huaxing(object):
     #攻击力 防御力 生命值
@@ -21,7 +17,7 @@ class Huaxing(object):
         self.Life_Value=Life_Value #生命值
     
      def Run_Skill(self,x) :
-        print("%s is running Skill" % x)
+        print("running Skill 造成伤害",x)
 
 class Boss(object):
     #攻击力 防御力 生命值
@@ -32,7 +28,7 @@ class Boss(object):
         self.Life_Value=Life_Value #生命值
     
      def Run_Skill(self,x) :
-        print("%s is running Skill" % x)
+        print("running Skill 造成伤害",x)
 
 class Cur_Buf(object):
     def __init__(self,Damage,Defense,Life_Value) :
@@ -71,8 +67,11 @@ def Current_Debuf(HX,boss):
 
 def HX_Round(HX,boss):
     #当前buf和debuf
+    #持续的回合数
     Current_Buf(HX,boss)
     Current_Debuf(HX,boss)
+    
+    HX[0].Run_Skill(boss.Defense)
 
 def Boss_Round(HX,boss):
     #当前buf和debuf
@@ -113,7 +112,11 @@ def main():
 
     boss = Boss('Boss',1000,998,999)
     #boss.Run_Skill('Boss')
-    #游戏开始
-    Game_start(HX,boss)
+
+    #将所有打印日志输出到一个文件中
+    with open("mygamefile.txt",'w+',encoding='UTF-8') as fw:
+        #sys.stdout=fw
+        #游戏开始
+        Game_start(HX,boss)
 
 main()
