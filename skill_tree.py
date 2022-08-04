@@ -1,10 +1,6 @@
-  #技能树
 
-from nis import match
-import re
-from tkinter.messagebox import RETRY
-
-
+Total_Damage=0
+#技能树
 Skill_Tree = {'异色神光':'镇压敌方单体，造成攻击152%的伤害',
             '大荒八卦阵':'绞杀敌方单体，造成攻击142%的伤害',
             '聚能投射':'光线射击敌方单体，造成攻击148%的伤害',
