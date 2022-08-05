@@ -1,4 +1,8 @@
 
+HXBUF={}
+HXTEMP={}
+change = True
+count =0
 Total_Damage=0
 #技能树
 Skill_Tree = {'异色神光':'镇压敌方单体，造成攻击152%的伤害',
