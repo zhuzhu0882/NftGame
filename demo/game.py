@@ -1,15 +1,17 @@
-from person.boss import create_boss
-from person.super_man import create_super_man
-from person.super_woman import create_super_woman
+from person.create_person import *
 
 class Create_Game(object):
+    '''
+    创建一场游戏
+    '''
     def __init__(self, rounds):
         self.rounds=rounds
 
     def create_scenes(self):
-        boss=create_boss()
-        man=create_super_man()
-        woman=create_super_woman()
+        person=Create_Person()
+        boss=person.create_boss()
+        man=person.create_super_man()
+        woman=person.create_super_woman()
 
     def game_round(self):
         pass

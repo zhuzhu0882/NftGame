@@ -1,14 +1,11 @@
-import os
-import random
-import sys
 
 class Passive_Skill(object):
     '''
     被动技能
     '''
     def __init__(self, passive_skill):
-        self.passive_skill_name=passive_skill[0]
-        self.passive_skill_hurt=passive_skill[1]
+        self.passive_skill_name=passive_skill.keys()
+        self.passive_skill_hurt=passive_skill.values()
 
     def show_passive_skill_info(self):
         print(self.passive_skill_name + ": %d" %self.passive_skill_hurt)
@@ -18,8 +15,8 @@ class Active_Skill(object):
     主动技能
     '''  
     def __init__(self, skill):
-        self.active_skill_name=skill[0]
-        self.active_skill_hurt=skill[1]
+        self.active_skill_name=skill.keys()
+        self.active_skill_hurt=skill.values()
 
     def show_active_skill_info(self):
         print(self.active_skill_name + ": %d" %self.active_skill_hurt)
@@ -33,9 +30,9 @@ class Person_Base_Attribute(object):
         '''
         初始化需要传入一个1x3数组，分别为攻击力，防御力，生命值
         '''
-        self.damage=base_attr[0]
-        self.defense=base_attr[1]
-        self.life_value=base_attr[2]
+        self.damage=base_attr['damage']
+        self.defense=base_attr['defense']
+        self.life_value=base_attr['life_value']
 
     def show_person_base_info(self):
         print("damage: %d" %self.damage)
@@ -110,8 +107,6 @@ class Person_Create_Have_Blue_Bar(Person_Base_Attribute, Active_Skill, Passive_S
         super().show_person_base_info()
         super().show_active_skill_info()
         super().show_passive_skill_info()
-
-
 
 class Boss_Create(Person_Create):
     '''
