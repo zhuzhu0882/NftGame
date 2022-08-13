@@ -58,31 +58,39 @@ class Cur_deuf(object):
         self.Defense=Defense #防御力
         self.Life_Value=Life_Value #生命值
 
-def Init_State(HX,boss):
+def Init_State(HX,BOSS):
     print('-----人物基本面板初始状态-----')
     for x in HX :
         print(x.Name,x.Damage,x.Defense,x.Life_Value)
 
-    print(boss.Name,boss.Damage,boss.Defense,boss.Life_Value) 
+    for y in BOSS :
+        print(y.Name,y.Damage,y.Defense,y.Life_Value)
+    #print(BOSS.Name,BOSS.Damage,BOSS.Defense,BOSS.Life_Value) 
     print('---------------------------')
 
-def Current_State(HX,boss):
-    for x,xx in zip(HX,range(5)) :
+def Current_State(HX,BOSS):
+    for x,xx in zip(HX,range(len(HX))) :
         print(x.Name,x.Damage,x.Defense,x.Life_Value)
         if x.Life_Value <=0:
             #HX.remove(x)
             [x.Damage,x.Defense,x.Life_Value]=[0,0,0]
-    print(boss.Name,boss.Damage,boss.Defense,boss.Life_Value)   
 
-def Current_Buf(HX,boss):
+    for y,yy in zip(BOSS,range(len(BOSS))) :
+        print(y.Name,y.Damage,y.Defense,y.Life_Value)
+        if y.Life_Value <=0:
+            #HX.remove(x)
+            [y.Damage,y.Defense,y.Life_Value]=[0,0,0]
+    #print(BOSS.Name,BOSS.Damage,BOSS.Defense,BOSS.Life_Value)   
+
+def Current_Buf(HX,BOSS):
     global count
     global HXBUF
     global hx_buf_change
     if hx_buf_change:
-        for z,zz in zip(HX,range(5)):
+        for z,zz in zip(HX,range(len(HX))):
             HXBUF[zz] = z.Buf
         hx_buf_change=False
-    for y,yy in zip(HX,range(5)): 
+    for y,yy in zip(HX,range(len(HX))): 
         if y.Life_Value >0:
             if randint(1,100) <=y.Ram:        
                 L1 = [y.Damage,y.Defense,y.Life_Value,0]
@@ -105,67 +113,83 @@ def Current_Buf(HX,boss):
                     [y.Damage,y.Defense] = HXTEMP[yy][0:2]
                     y.Buf_Count =0
 
-def Current_Debuf(HX,boss):
+def Current_Debuf(HX,BOSS):
     cur_debuf = 0
 
-def Boss_Current_Buf(HX,boss):
+def Boss_Current_Buf(HX,BOSS):
     global boss_count
     global BOSSBUF
     global boss_buf_change
     if boss_buf_change:
-        BOSSBUF = boss.Buf
+        #BOSSBUF = BOSS.Buf
+        for z,zz in zip(BOSS,range(len(BOSS))):
+            BOSSBUF[zz] = z.Buf
         boss_buf_change = False
-    if randint(1,100) <=boss.Ram:
-        L1 = [boss.Damage,boss.Defense,boss.Life_Value,0]
-        print('BOSS触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(boss.Buf[0:2])))
-        if boss.Buf[3]!=0: 
-            L1 = L1+np.multiply(np.array(L1),np.array(boss.Buf))
-            pass
-        else:
-            L1= L1+np.multiply(np.array(L1),np.array(boss.Buf))
-            pass
-        [boss.Damage,boss.Defense,boss.Life_Value]=L1[0:3]
-        boss.Buf=[0,0,0,0]
-        if boss.Buf_Count==0:
-            boss.Buf_Count=1
-    if boss.Buf_Count >=1:
-        boss.Buf_Count +=1
-        if boss.Buf_Count >4:
-            boss.Buf=BOSSBUF
-            [boss.Damage,boss.Defense] = BOSSTEMP[0:2]
-            boss.Buf_Count =0
+    for y,yy in zip(BOSS,range(len(BOSS))): 
+        if y.Life_Value >0:
+            if randint(1,100) <=y.Ram:
+                L1 = [y.Damage,y.Defense,y.Life_Value,0]
+                print(y.Name,'触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2])))
+                if y.Buf[3]!=0: 
+                    L1 = L1+np.multiply(np.array(L1),np.array(y.Buf))
+                    pass
+                else:
+                    L1= L1+np.multiply(np.array(L1),np.array(y.Buf))
+                    pass
+                [y.Damage,y.Defense,y.Life_Value]=L1[0:3]
+                y.Buf=[0,0,0,0]
+                if y.Buf_Count==0:
+                    y.Buf_Count=1
+            if y.Buf_Count >=1:
+                y.Buf_Count +=1
+                if y.Buf_Count >4:
+                    y.Buf=BOSSBUF[yy]
+                    [y.Damage,y.Defense] = BOSSTEMP[yy][0:2]
+                    y.Buf_Count =0
 
-def Boss_Current_Debuf(HX,boss):
+def Boss_Current_Debuf(HX,BOSS):
     cur_debuf = 0
 
-def HX_Round(HX,boss):
+def HX_Round(HX,BOSS):
     #当前buf和debuf
     #持续的回合数
     global change
     global HXTEMP
     if change :
-        for y,i in zip(HX,range(5)):
-            HXTEMP[i] = [y.Damage,y.Defense,y.Life_Value]
+        for yy,ii in zip(HX,range(len(HX))):
+            HXTEMP[ii] = [yy.Damage,yy.Defense,yy.Life_Value]
             #print(HXTEMP[i])
         change=False
-    Current_Buf(HX,boss)
-    """
-    if cur_count ==3:   
-        for yy,ii in zip(HX,range(5)):
-            [yy.Damage,yy.Defense] = HXTEMP[ii]
-    """
+    Current_Buf(HX,BOSS)
+
+    if len(BOSS) > 1:
+        randint_dex = randint(0,len(BOSS)-1)
+        while BOSS[randint_dex].Life_Value <=0:
+            randint_dex = randint(0,len(BOSS)-1)
+    else:
+        randint_dex=0
     #Current_Debuf(HX,boss)
-    
-    #HX[0].Run_Skill(boss.Defense)
     global Total_Damage
-    for x,i in zip(HX,range(5)) :
+    for x,i in zip(HX,range(len(HX))) :
         if x.Life_Value >0:
             if(x.Mana>=3):
                 if Skill_Value(x.Skill_Name)[0] !=0:
-                    print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -boss.Defense)
-                    boss.Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -boss.Defense)
-                    Total_Damage +=(x.Damage * Skill_Value(x.Skill_Name)[0] -boss.Defense) 
-                    x.Mana -=3
+                    if Skill_Value(x.Skill_Name)[3] ==0:
+                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了',BOSS[randint_dex].Name,Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense)
+                        BOSS[randint_dex].Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense)
+                        Total_Damage +=(x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense) 
+                        x.Mana -=3
+                    else: 
+                        Cur_Damage = 0                     
+                        for z in BOSS: 
+                            if z.Life_Value >0:
+                                z.Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense)
+                                Cur_Damage  +=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense) 
+                                Total_Damage +=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense) 
+                        x.Mana -=3
+                        #x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense
+                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体BOSS',Skill_Tree.get(x.Skill_Name),'造成的全体伤害值为:',Cur_Damage)
+
                 elif Skill_Value(x.Skill_Name)[1] !=0:
                     print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'增加自身防御值为:',x.Defense * Skill_Value(x.Skill_Name)[1])
                     x.Defense +=(x.Defense * Skill_Value(x.Skill_Name)[1])
@@ -181,7 +205,7 @@ def HX_Round(HX,boss):
                         x.Mana -=3
                     else :
                         print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'恢复全体血量值为:',HXTEMP[i][2] * Skill_Value(x.Skill_Name)[2])
-                        for y,j in zip(HX,range(5)):
+                        for y,j in zip(HX,range(len(HX))):
                             if y.Life_Value >0:
                                 y.Life_Value +=HXTEMP[i][2] * Skill_Value(x.Skill_Name)[2]
                                 if y.Life_Value >=HXTEMP[j][2]:
@@ -190,29 +214,28 @@ def HX_Round(HX,boss):
                         x.Mana -=3
                     
             else:
-                print(x.Name,'使用普通攻击:','造成的伤害值为:',x.Damage-boss.Defense)
-                boss.Life_Value -=(x.Damage-boss.Defense)
-                Total_Damage +=(x.Damage-boss.Defense)
+                print(x.Name,'使用普通攻击:','攻击了',BOSS[randint_dex].Name,'造成的伤害值为:',x.Damage-BOSS[randint_dex].Defense)
+                BOSS[randint_dex].Life_Value -=(x.Damage-BOSS[randint_dex].Defense)
+                Total_Damage +=(x.Damage-BOSS[randint_dex].Defense)
             
             x.Mana +=1
     print('当前总伤害为:',Total_Damage)
-        
 
-    #print('造成实际伤害',x.Damage * Skill_Value(x.Skill_Name) -boss.Defense)
-
-def Boss_Round(HX,boss):
+def Boss_Round(HX,BOSS):
     #当前buf和debuf
-    #Boss_Current_Buf(HX,boss)
-    #Boss_Current_Debuf(HX,boss)
+    #Boss_Current_Buf(HX,BOSS)
+    #Boss_Current_Debuf(HX,BOSS)
     global boss_change
     global BOSSTEMP
     if boss_change :
-        BOSSTEMP = [boss.Damage,boss.Defense,boss.Life_Value]
+        #BOSSTEMP = [BOSS.Damage,BOSS.Defense,BOSS.Life_Value]
+        for y,i in zip(BOSS,range(len(BOSS))):
+            BOSSTEMP[i] = [y.Damage,y.Defense,y.Life_Value]
         boss_change=False
-    Boss_Current_Buf(HX,boss)
-    #Current_Debuf(HX,boss)
+    Boss_Current_Buf(HX,BOSS)
+    #Current_Debuf(HX,BOSS)
     
-    #HX[0].Run_Skill(boss.Defense)
+    #HX[0].Run_Skill(BOSS.Defense)
     if len(HX) > 1:
         randint_dex = randint(0,len(HX)-1)
         while HX[randint_dex].Life_Value <=0:
@@ -220,52 +243,68 @@ def Boss_Round(HX,boss):
     else:
         randint_dex=0
 
-    if(boss.Mana>=3):
-        if Skill_Value(boss.Skill_Name)[0] !=0:
-            print(boss.Name,'使用技能:'+boss.Skill_Name,'攻击了',HX[randint_dex].Name,Skill_Tree.get(boss.Skill_Name),'造成的伤害值为:',boss.Damage * Skill_Value(boss.Skill_Name)[0] -HX[randint_dex].Defense)
-            HX[randint_dex].Life_Value -=(boss.Damage * Skill_Value(boss.Skill_Name)[0] -HX[randint_dex].Defense)
-            boss.Mana -=3
-    else:
-        print(boss.Name,'使用普通攻击攻击了:',HX[randint_dex].Name,'造成的伤害值为:',boss.Damage-HX[randint_dex].Defense)
-        HX[randint_dex].Life_Value -=(boss.Damage-HX[randint_dex].Defense)
-    boss.Mana +=1
-    
+    for x,j in zip(BOSS,range(len(BOSS))) :
+        if x.Life_Value >0:
+            if(x.Mana>=3):
+                if Skill_Value(x.Skill_Name)[0] !=0:
+                    if Skill_Value(x.Skill_Name)[3] ==0:
+                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了',HX[randint_dex].Name,Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
+                        HX[randint_dex].Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
+                        x.Mana -=3
+                    else:
+                        #print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX',Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
+                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX''\t')
+                        for z in HX: 
+                            if z.Life_Value >0:
+                                print('对',z.Name,'造成了伤害值为:',(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense))
+                                z.Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense)                              
+                        x.Mana -=3
+            else:
+                print(x.Name,'使用普通攻击攻击了:',HX[randint_dex].Name,'造成的伤害值为:',x.Damage-HX[randint_dex].Defense)
+                HX[randint_dex].Life_Value -=(x.Damage-HX[randint_dex].Defense)
+        x.Mana +=1
     pass
 
 
 #游戏回合
-def Game_Round(HX,boss) :
+def Game_Round(HX,BOSS) :
     #化形的回合
-    HX_Round(HX,boss)
-    if boss.Life_Value <=0:
+    HX_Round(HX,BOSS)
+    boss_value=0
+    #if BOSS.Life_Value <=0:
+    for z in BOSS :
+        if z.Life_Value >0:
+            boss_value =1
+            break
+    if boss_value != 1:
         print('恭喜你击败了BOSS!!')
         sys.exit()
     #Boss的回合
-    Boss_Round(HX,boss)
-    Current_State(HX,boss)
-    value =0
+    Boss_Round(HX,BOSS)
+    Current_State(HX,BOSS)
+    hx_value =0
     for x in HX :
         if x.Life_Value >0:
-            value =1
+            hx_value =1
             break
-    if value != 1:
+    if hx_value != 1:
         print('你被击败了,游戏结束!!')
         sys.exit()
  
 
 
-def Game_start(HX,boss):
+def Game_start(HX,BOSS):
     global init_change
     #人物初始状态
     if init_change:
-        Init_State(HX,boss)
+        Init_State(HX,BOSS)
         init_change=False
     #游戏一共10回合或者boss生命值为0
     #统计总伤害
     for round in range(20):
         print('==============第',index(round),'回合=============')
-        Game_Round(HX,boss)
-    Current_State(HX,boss)
+        Game_Round(HX,BOSS)
+    Current_State(HX,BOSS)
 
 
 def main():
@@ -274,21 +313,23 @@ def main():
 
     #print(Skill_Tree.get('异色神光')) 
     #人物基本面板  攻击力 防御力 生命值 技能名称 法力初始值 增buf 触发概率 持续回合数
-    Huaxing_A = Huaxing('Huaxing_A',200,100,999,'异色神光',6,[0.3,0,0,0],30,0)
-    Huaxing_B = Huaxing('Huaxing_B',198,101,998,'大荒八卦阵',7,[0,0.5,0,1],30,0)
-    Huaxing_C = Huaxing('Huaxing_C',197,102,1000,'聚能投射',6,[0.3,0,0,0],30,0)
-    Huaxing_D = Huaxing('Huaxing_D',196,103,996,'玄阳剑诀',7,[0,0.4,0,0],30,0)
-    Huaxing_E = Huaxing('Huaxing_E',195,104,995,'回魂术',8,[0.5,0,0,0],25,0)
+    Huaxing_A = Huaxing('Huaxing_A',200,100,2999,'异色神光',6,[0.3,0,0,0],30,0)
+    Huaxing_B = Huaxing('Huaxing_B',198,101,2998,'大荒八卦阵',7,[0,0.5,0,1],30,0)
+    Huaxing_C = Huaxing('Huaxing_C',197,102,2000,'聚能投射',6,[0.3,0,0,0],30,0)
+    Huaxing_D = Huaxing('Huaxing_D',196,103,2996,'玄阳剑诀',7,[0,0.4,0,0],30,0)
+    Huaxing_E = Huaxing('Huaxing_E',195,104,2995,'回魂术',8,[0.5,0,0,0],25,0)
 
     HX=[Huaxing_A,Huaxing_B,Huaxing_C,Huaxing_D,Huaxing_E]
 
-    boss = Boss('Boss',360,138,9999,'灭魂针',8,[0.3,0.3,0,0],25,0)
+    boss1 = Boss('1号Boss',360,138,9999,'灭魂针',8,[0.3,0.3,0,0],25,0)
+    boss2 = Boss('2号Boss',380,148,9999,'异色神光',8,[0.5,0.3,0,0],30,0)
+    BOSS= [boss1,boss2]
     #boss.Run_Skill('Boss')
 
     #将所有打印日志输出到一个文件中
     with open("mygamefile.txt",'w+',encoding='UTF-8') as fw:
         #sys.stdout=fw
         #游戏开始
-        Game_start(HX,boss)
+        Game_start(HX,BOSS)
 
 main()
