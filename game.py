@@ -16,7 +16,7 @@ from skill_tree import count,change,HXTEMP,HXBUF,boss_change,BOSSBUF,BOSSTEMP,bo
 
 class Huaxing(object):
     #攻击力 防御力 生命值 技能 法力值
-     def __init__(self,Name,Damage,Defense,Life_Value,Skill_Name,Mana,Buf,Ram,Buf_Count) :
+     def __init__(self,Name,Damage,Defense,Life_Value,Skill_Name,Mana,Buf,Ram,Buf_Count,Buf_Add) :
         self.Name=Name   #名称
         self.Damage=Damage  #攻击力
         self.Defense=Defense #防御力
@@ -26,13 +26,14 @@ class Huaxing(object):
         self.Buf=Buf
         self.Ram=Ram
         self.Buf_Count=Buf_Count
+        self.Buf_Add=Buf_Add
     
      def Run_Skill(self,x) :
         print("running Skill 造成伤害",x)
 
 class Boss(object):
     #攻击力 防御力 生命值
-     def __init__(self,Name,Damage,Defense,Life_Value,Skill_Name,Mana,Buf,Ram,Buf_Count) :
+     def __init__(self,Name,Damage,Defense,Life_Value,Skill_Name,Mana,Buf,Ram,Buf_Count,Buf_Add) :
         self.Name=Name
         self.Damage=Damage  #攻击力
         self.Defense=Defense #防御力
@@ -42,6 +43,7 @@ class Boss(object):
         self.Buf=Buf
         self.Ram=Ram
         self.Buf_Count=Buf_Count
+        self.Buf_Add=Buf_Add
     
      def Run_Skill(self,x) :
         print("running Skill 造成伤害",x)
@@ -91,27 +93,46 @@ def Current_Buf(HX,BOSS):
             HXBUF[zz] = z.Buf
         hx_buf_change=False
     for y,yy in zip(HX,range(len(HX))): 
+        #if y.Life_Value >0:
+        if y.Buf_Count >=4:
+            y.Buf=HXBUF[yy]
+            if y.Buf[3] ==0:
+                if y.Buf[0] !=0:
+                    y.Damage -= y.Buf_Add
+                elif y.Buf[1] !=0:
+                    y.Defense -= y.Buf_Add
+            elif y.Buf[3] ==1:
+                if y.Buf[0] !=0:
+                    for k,kk in zip(HX,range(len(HX))):  
+                        k.Damage -= y.Buf_Add 
+                elif y.Buf[1] !=0:
+                    for k,kk in zip(HX,range(len(HX))):
+                        k.Defense -= y.Buf_Add 
+            y.Buf_Count =0     
+        if y.Life_Value <=0:
+            [y.Damage,y.Defense,y.Life_Value]=[0,0,0]
         if y.Life_Value >0:
             if randint(1,100) <=y.Ram:        
                 L1 = [y.Damage,y.Defense,y.Life_Value,0]
-                print(y.Name,'触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2])))
+                if y.Buf_Count==0:  
+                    print(y.Name,'触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2])))
                 if y.Buf[3]!=0:
                     for x in HX: 
-                        L1 = L1+np.multiply(np.array(L1),np.array(x.Buf))
-                        pass
+                        [x.Damage,x.Defense] =[x.Damage,x.Defense] + np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2]))
                 else:
-                    L1= L1+np.multiply(np.array(L1),np.array(y.Buf))
-                    pass
-                [y.Damage,y.Defense,y.Life_Value]=L1[0:3]
+                    #L1= L1+np.multiply(np.array(L1),np.array(y.Buf))
+                    [y.Damage,y.Defense]=[y.Damage,y.Defense]+np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2]))
+                #[y.Damage,y.Defense,y.Life_Value]=L1[0:3]
+                if y.Buf[0] !=0 and y.Buf_Count==0:
+                    y.Buf_Add = np.multiply(np.array(L1[0]),np.array(y.Buf[0]))
+                if y.Buf[1] !=0 and y.Buf_Count==0:
+                    y.Buf_Add = np.multiply(np.array(L1[1]),np.array(y.Buf[1]))
                 y.Buf=[0,0,0,0]
-                if y.Buf_Count==0:
+                if y.Buf_Count==0 :
                     y.Buf_Count=1
             if y.Buf_Count >=1:
                 y.Buf_Count +=1
-                if y.Buf_Count >4:
-                    y.Buf=HXBUF[yy]
-                    [y.Damage,y.Defense] = HXTEMP[yy][0:2]
-                    y.Buf_Count =0
+
 
 def Current_Debuf(HX,BOSS):
     cur_debuf = 0
@@ -126,26 +147,52 @@ def Boss_Current_Buf(HX,BOSS):
             BOSSBUF[zz] = z.Buf
         boss_buf_change = False
     for y,yy in zip(BOSS,range(len(BOSS))): 
+        #if y.Life_Value >0:
+        if y.Buf_Count >=4:
+            y.Buf=BOSSBUF[yy]
+            if y.Buf[3] ==0:
+                if y.Buf[0] !=0:
+                    y.Damage -= y.Buf_Add
+                elif y.Buf[1] !=0:
+                    y.Defense -= y.Buf_Add
+            elif y.Buf[3] ==1:
+                if y.Buf[0] !=0:
+                    for k in BOSS:  
+                        k.Damage -= y.Buf_Add 
+                elif y.Buf[1] !=0:
+                    for k in BOSS:
+                        k.Defense -= y.Buf_Add 
+            y.Buf_Count =0
+        if y.Life_Value <=0:
+            [y.Damage,y.Defense,y.Life_Value]=[0,0,0]
         if y.Life_Value >0:
             if randint(1,100) <=y.Ram:
                 L1 = [y.Damage,y.Defense,y.Life_Value,0]
-                print(y.Name,'触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2])))
-                if y.Buf[3]!=0: 
-                    L1 = L1+np.multiply(np.array(L1),np.array(y.Buf))
-                    pass
+                if y.Buf_Count==0:
+                    print(y.Name,'触发了被动技能攻击力防御力增加:',np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2])))
+
+                if y.Buf[3]!=0:
+                    for x in BOSS: 
+                        [x.Damage,x.Defense] =[x.Damage,x.Defense] + np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2]))
                 else:
-                    L1= L1+np.multiply(np.array(L1),np.array(y.Buf))
-                    pass
-                [y.Damage,y.Defense,y.Life_Value]=L1[0:3]
+                    #L1= L1+np.multiply(np.array(L1),np.array(y.Buf))
+                    [y.Damage,y.Defense]=[y.Damage,y.Defense]+np.multiply(np.array(L1[0:2]),np.array(y.Buf[0:2]))
+
+                if y.Buf[0] !=0 and y.Buf_Count==0:
+                    y.Buf_Add = np.multiply(np.array(L1[0]),np.array(y.Buf[0]))
+                if y.Buf[1] !=0 and y.Buf_Count==0:
+                    y.Buf_Add = np.multiply(np.array(L1[1]),np.array(y.Buf[1]))
                 y.Buf=[0,0,0,0]
                 if y.Buf_Count==0:
                     y.Buf_Count=1
             if y.Buf_Count >=1:
                 y.Buf_Count +=1
+            """
                 if y.Buf_Count >4:
                     y.Buf=BOSSBUF[yy]
                     [y.Damage,y.Defense] = BOSSTEMP[yy][0:2]
                     y.Buf_Count =0
+            """
 
 def Boss_Current_Debuf(HX,BOSS):
     cur_debuf = 0
@@ -253,7 +300,7 @@ def Boss_Round(HX,BOSS):
                         x.Mana -=3
                     else:
                         #print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX',Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
-                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX''\t')
+                        print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX')
                         for z in HX: 
                             if z.Life_Value >0:
                                 print('对',z.Name,'造成了伤害值为:',(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense))
@@ -301,7 +348,7 @@ def Game_start(HX,BOSS):
         init_change=False
     #游戏一共10回合或者boss生命值为0
     #统计总伤害
-    for round in range(20):
+    for round in range(40):
         print('==============第',index(round),'回合=============')
         Game_Round(HX,BOSS)
     Current_State(HX,BOSS)
@@ -312,17 +359,17 @@ def main():
     #没人上限6格魔晶 初始6格 每回合恢复2格魔晶
 
     #print(Skill_Tree.get('异色神光')) 
-    #人物基本面板  攻击力 防御力 生命值 技能名称 法力初始值 增buf 触发概率 持续回合数
-    Huaxing_A = Huaxing('Huaxing_A',200,100,2999,'异色神光',6,[0.3,0,0,0],30,0)
-    Huaxing_B = Huaxing('Huaxing_B',198,101,2998,'大荒八卦阵',7,[0,0.5,0,1],30,0)
-    Huaxing_C = Huaxing('Huaxing_C',197,102,2000,'聚能投射',6,[0.3,0,0,0],30,0)
-    Huaxing_D = Huaxing('Huaxing_D',196,103,2996,'玄阳剑诀',7,[0,0.4,0,0],30,0)
-    Huaxing_E = Huaxing('Huaxing_E',195,104,2995,'回魂术',8,[0.5,0,0,0],25,0)
+    #人物基本面板  攻击力 防御力 生命值 技能名称 法力初始值 增buf 触发概率 持续回合数 buf增加的值
+    Huaxing_A = Huaxing('Huaxing_A',200,100,3999,'异色神光',6,[0.3,0,0,0],30,0,0)
+    Huaxing_B = Huaxing('Huaxing_B',198,101,3998,'大荒八卦阵',7,[0,0.5,0,1],30,0,0)
+    Huaxing_C = Huaxing('Huaxing_C',197,102,3000,'聚能投射',6,[0.3,0,0,0],30,0,0)
+    Huaxing_D = Huaxing('Huaxing_D',196,103,3996,'玄阳剑诀',7,[0,0.4,0,0],30,0,0)
+    Huaxing_E = Huaxing('Huaxing_E',195,104,3995,'回魂术',8,[0.5,0,0,0],25,0,0)
 
     HX=[Huaxing_A,Huaxing_B,Huaxing_C,Huaxing_D,Huaxing_E]
 
-    boss1 = Boss('1号Boss',360,138,9999,'灭魂针',8,[0.3,0.3,0,0],25,0)
-    boss2 = Boss('2号Boss',380,148,9999,'异色神光',8,[0.5,0.3,0,0],30,0)
+    boss1 = Boss('1号Boss',360,138,9999,'灭魂针',8,[0,0.3,0,0],25,0,0)
+    boss2 = Boss('2号Boss',380,148,9999,'异色神光',8,[0.5,0,0,1],30,0,0)
     BOSS= [boss1,boss2]
     #boss.Run_Skill('Boss')
 
