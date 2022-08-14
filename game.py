@@ -219,13 +219,13 @@ def HX_Round(HX,BOSS):
     global Total_Damage
     for x,i in zip(HX,range(len(HX))) :
         if x.Life_Value >0:
-            if(x.Mana>=3):
+            if(x.Mana>=Skill_Value(x.Skill_Name)[4]):
                 if Skill_Value(x.Skill_Name)[0] !=0:
                     if Skill_Value(x.Skill_Name)[3] ==0:
                         print(x.Name,'使用技能:'+x.Skill_Name,'攻击了',BOSS[randint_dex].Name,Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense)
                         BOSS[randint_dex].Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense)
                         Total_Damage +=(x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense) 
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
                     else: 
                         Cur_Damage = 0                     
                         for z in BOSS: 
@@ -233,7 +233,7 @@ def HX_Round(HX,BOSS):
                                 z.Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense)
                                 Cur_Damage  +=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense) 
                                 Total_Damage +=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense) 
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
                         #x.Damage * Skill_Value(x.Skill_Name)[0] -BOSS[randint_dex].Defense
                         print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体BOSS',Skill_Tree.get(x.Skill_Name),'造成的全体伤害值为:',Cur_Damage)
 
@@ -241,7 +241,7 @@ def HX_Round(HX,BOSS):
                     print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'增加自身防御值为:',x.Defense * Skill_Value(x.Skill_Name)[1])
                     x.Defense +=(x.Defense * Skill_Value(x.Skill_Name)[1])
                     Total_Damage +=0
-                    x.Mana -=3
+                    x.Mana -=Skill_Value(x.Skill_Name)[4]
                 elif Skill_Value(x.Skill_Name)[2] !=0:
                     if Skill_Value(x.Skill_Name)[3] ==0:
                         print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'恢复自身血量值为:',x.Life_Value * Skill_Value(x.Skill_Name)[2])
@@ -249,7 +249,7 @@ def HX_Round(HX,BOSS):
                         if x.Life_Value >=HXTEMP[i][2]:
                             x.Life_Value = HXTEMP[i][2]
                         Total_Damage +=0
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
                     else :
                         print(x.Name,'使用技能:'+x.Skill_Name,Skill_Tree.get(x.Skill_Name),'恢复全体血量值为:',HXTEMP[i][2] * Skill_Value(x.Skill_Name)[2])
                         for y,j in zip(HX,range(len(HX))):
@@ -258,7 +258,7 @@ def HX_Round(HX,BOSS):
                                 if y.Life_Value >=HXTEMP[j][2]:
                                     y.Life_Value = HXTEMP[j][2]
                         Total_Damage +=0
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
                     
             else:
                 print(x.Name,'使用普通攻击:','攻击了',BOSS[randint_dex].Name,'造成的伤害值为:',x.Damage-BOSS[randint_dex].Defense)
@@ -292,12 +292,12 @@ def Boss_Round(HX,BOSS):
 
     for x,j in zip(BOSS,range(len(BOSS))) :
         if x.Life_Value >0:
-            if(x.Mana>=3):
+            if(x.Mana>=Skill_Value(x.Skill_Name)[4]):
                 if Skill_Value(x.Skill_Name)[0] !=0:
                     if Skill_Value(x.Skill_Name)[3] ==0:
                         print(x.Name,'使用技能:'+x.Skill_Name,'攻击了',HX[randint_dex].Name,Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
                         HX[randint_dex].Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
                     else:
                         #print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX',Skill_Tree.get(x.Skill_Name),'造成的伤害值为:',x.Damage * Skill_Value(x.Skill_Name)[0] -HX[randint_dex].Defense)
                         print(x.Name,'使用技能:'+x.Skill_Name,'攻击了','全体HX')
@@ -305,7 +305,7 @@ def Boss_Round(HX,BOSS):
                             if z.Life_Value >0:
                                 print('对',z.Name,'造成了伤害值为:',(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense))
                                 z.Life_Value -=(x.Damage * Skill_Value(x.Skill_Name)[0] -z.Defense)                              
-                        x.Mana -=3
+                        x.Mana -=Skill_Value(x.Skill_Name)[4]
             else:
                 print(x.Name,'使用普通攻击攻击了:',HX[randint_dex].Name,'造成的伤害值为:',x.Damage-HX[randint_dex].Defense)
                 HX[randint_dex].Life_Value -=(x.Damage-HX[randint_dex].Defense)
